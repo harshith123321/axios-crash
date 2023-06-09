@@ -1,87 +1,141 @@
 // GET REQUEST
 function getTodos() {
-  console.log('GET Request');
+  axios.get('/api/todos')
+    .then(function (response) {
+      console.log('GET Request', response);
+      showOutput(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }
 
 // POST REQUEST
 function addTodo() {
-  console.log('POST Request');
+  axios.post('/api/todos', {
+      title: 'New Todo',
+      completed: false
+    })
+    .then(function (response) {
+      console.log('POST Request', response);
+      showOutput(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }
 
 // PUT/PATCH REQUEST
 function updateTodo() {
-  console.log('PUT/PATCH Request');
+  axios.put('/api/todos/1', {
+      title: 'Updated Todo',
+      completed: true
+    })
+    .then(function (response) {
+      console.log('PUT/PATCH Request', response);
+      showOutput(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }
 
 // DELETE REQUEST
 function removeTodo() {
-  console.log('DELETE Request');
+  axios.delete('/api/todos/1')
+    .then(function (response) {
+      console.log('DELETE Request', response);
+      showOutput(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }
 
 // SIMULTANEOUS DATA
 function getData() {
-  console.log('Simultaneous Request');
+  axios.all([
+      axios.get('/api/todos'),
+      axios.get('/api/posts')
+    ])
+    .then(axios.spread(function (todos, posts) {
+      console.log('Simultaneous Request');
+      console.log('Todos', todos);
+      console.log('Posts', posts);
+      // You can show output for each request if needed
+      showOutput(todos);
+      showOutput(posts);
+    }))
+    .catch(function (error) {
+      console.log(error);
+    });
 }
 
 // CUSTOM HEADERS
 function customHeaders() {
-  console.log('Custom Headers');
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer token'
+    }
+  };
+
+  axios.get('/api/todos', config)
+    .then(function (response) {
+      console.log('Custom Headers', response);
+      showOutput(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }
 
 // TRANSFORMING REQUESTS & RESPONSES
 function transformResponse() {
-  console.log('Transform Response');
+  const options = {
+    transformResponse: axios.defaults.transformResponse.concat(function (data) {
+      data.title = data.title.toUpperCase();
+      return data;
+    })
+  };
+
+  axios.get('/api/todos', options)
+    .then(function (response) {
+      console.log('Transform Response', response);
+      showOutput(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }
 
 // ERROR HANDLING
 function errorHandling() {
-  console.log('Error Handling');
+  axios.get('/api/todos')
+    .then(function (response) {
+      console.log('Error Handling', response);
+      showOutput(response);
+    })
+    .catch(function (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+      } else {
+        console.log(error.message);
+      }
+      console.log(error.config);
+    });
 }
 
 // CANCEL TOKEN
 function cancelToken() {
-  console.log('Cancel Token');
-}
+ 
 
-// INTERCEPTING REQUESTS & RESPONSES
-
-// AXIOS INSTANCES
-
-// Show output in browser
-function showOutput(res) {
-  document.getElementById('res').innerHTML = `
-  <div class="card card-body mb-4">
-    <h5>Status: ${res.status}</h5>
-  </div>
-
-  <div class="card mt-3">
-    <div class="card-header">
-      Headers
-    </div>
-    <div class="card-body">
-      <pre>${JSON.stringify(res.headers, null, 2)}</pre>
-    </div>
-  </div>
-
-  <div class="card mt-3">
-    <div class="card-header">
-      Data
-    </div>
-    <div class="card-body">
-      <pre>${JSON.stringify(res.data, null, 2)}</pre>
-    </div>
-  </div>
-
-  <div class="card mt-3">
-    <div class="card-header">
-      Config
-    </div>
-    <div class="card-body">
-      <pre>${JSON.stringify(res.config, null, 2)}</pre>
-    </div>
-  </div>
-`;
-}
 
 // Event listeners
 document.getElementById('get').addEventListener('click', getTodos);
